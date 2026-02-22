@@ -215,20 +215,16 @@ function toggleOvertakeManual(){
 // ─── Mapa ───
 // Ícono de auto como SVG inline
 function getCarIcon(heading){
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-    <g transform="rotate(${heading},16,16)">
-      <ellipse cx="16" cy="16" rx="8" ry="12" fill="#00e5ff" stroke="#fff" stroke-width="2"/>
-      <polygon points="16,4 20,12 12,12" fill="#fff" opacity="0.9"/>
-      <rect x="11" y="10" width="10" height="7" rx="2" fill="#0a1628" opacity="0.6"/>
-    </g>
-  </svg>`;
   return {
-    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
-    scaledSize: new google.maps.Size(32, 32),
-    anchor: new google.maps.Point(16, 16)
+    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+    scale: 7,
+    fillColor: '#00e5ff',
+    fillOpacity: 1,
+    strokeColor: '#ffffff',
+    strokeWeight: 2,
+    rotation: heading
   };
 }
-
 function updateMapPosition(lat,lng){
   document.getElementById('mapPlaceholder').style.display='none';
   if(!googleMap)return;
