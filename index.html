@@ -535,12 +535,11 @@ function updateMapPosition(lat, lng) {
     } else {
       myMapMarker.setPosition(pos);
     }
-    // Centrar siempre en la posición actual mientras se mueve
-    googleMap.moveCamera({
-  center: pos,
-  zoom: 18,
-  tilt: 60,
-  heading: currentHeading
+    // Vista de conducción 3D
+googleMap.setCenter(pos);
+googleMap.setZoom(18);
+googleMap.setTilt(60);
+googleMap.setHeading(currentHeading);
 });
     // Primer centrado con zoom
     if (!mapCentered) {
