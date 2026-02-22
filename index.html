@@ -536,7 +536,12 @@ function updateMapPosition(lat, lng) {
       myMapMarker.setPosition(pos);
     }
     // Centrar siempre en la posición actual mientras se mueve
-    googleMap.panTo(pos);
+    googleMap.moveCamera({
+  center: pos,
+  zoom: 18,
+  tilt: 60,
+  heading: currentHeading
+});
     // Primer centrado con zoom
     if (!mapCentered) {
       mapCentered = true;
@@ -556,7 +561,9 @@ function updateMapPosition(lat, lng) {
 function initMap() {
   const mapEl = document.getElementById('map');
   googleMap = new google.maps.Map(mapEl, {
-    zoom: 15,
+    zoom: 18,
+tilt: 60,
+heading: 0,
     center: { lat: -32.889, lng: -68.845 },
     mapTypeId: 'roadmap',
     disableDefaultUI: false,
