@@ -10,227 +10,59 @@
 <title>OvertakeGuard</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap');
-
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
   :root {
-    --bg: #080c12;
-    --panel: #0d1420;
-    --accent: #00e5ff;
-    --safe: #00e676;
-    --warn: #ff6b00;
-    --danger: #ff1744;
-    --text: #c8d8f0;
-    --dim: #4a6080;
-    --border: #1a2540;
+    --bg: #080c12; --panel: #0d1420; --accent: #00e5ff;
+    --safe: #00e676; --warn: #ff6b00; --danger: #ff1744;
+    --text: #c8d8f0; --dim: #4a6080; --border: #1a2540;
   }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    user-select: none;
-  }
-
-  /* HEADER */
-  .header {
-    background: var(--panel);
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .header-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 2px;
-  }
-  .badge {
-    font-size: 11px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-weight: 600;
-    border: 1px solid var(--safe);
-    color: var(--safe);
-    background: rgba(0,230,118,0.08);
-  }
+  body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; user-select: none; }
+  .header { background: var(--panel); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .header-title { font-size: 18px; font-weight: 700; color: var(--accent); letter-spacing: 2px; }
+  .badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 600; border: 1px solid var(--safe); color: var(--safe); background: rgba(0,230,118,0.08); }
   .badge.offline { border-color: var(--dim); color: var(--dim); background: transparent; }
-
-  /* HUD */
-  .hud {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
-    padding: 8px;
-    flex-shrink: 0;
-  }
-  .hud-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 8px;
-    text-align: center;
-  }
+  .hud { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 8px; flex-shrink: 0; }
+  .hud-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 8px; text-align: center; }
   .hud-label { font-size: 9px; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; }
   .hud-value { font-size: 26px; font-weight: 700; color: var(--safe); line-height: 1.1; font-family: 'Share Tech Mono', monospace; }
   .hud-unit { font-size: 9px; color: var(--dim); }
-
-  /* MAPA */
-  #map {
-    flex: 1;
-    position: relative;
-    background: #0a1628;
-    overflow: hidden;
-  }
-  #map canvas { width: 100% !important; height: 100% !important; }
-
-  /* Ícono central cuando no hay mapa */
-  .map-placeholder {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-  }
+  #map { flex: 1; position: relative; background: #0a1628; overflow: hidden; }
+  .map-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; z-index: 1; background: #0a1628; }
   .map-placeholder .icon { font-size: 64px; opacity: 0.3; }
   .map-placeholder .text { color: var(--dim); font-size: 13px; letter-spacing: 1px; }
-
-  /* STATUS */
-  .status-card {
-    margin: 8px;
-    padding: 10px 14px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border: 1px solid var(--safe);
-    background: rgba(0,230,118,0.05);
-    flex-shrink: 0;
-    transition: all 0.3s;
-  }
+  .status-card { margin: 8px; padding: 10px 14px; border-radius: 10px; display: flex; align-items: center; gap: 12px; border: 1px solid var(--safe); background: rgba(0,230,118,0.05); flex-shrink: 0; transition: all 0.3s; }
   .status-card.warn { border-color: var(--warn); background: rgba(255,107,0,0.05); }
-  .status-card.danger { border-color: var(--danger); background: rgba(255,23,68,0.08); }
+  .status-card.danger { border-color: var(--danger); background: rgba(255,23,68,0.08); animation: pulse-card 1s infinite alternate; }
+  @keyframes pulse-card { from { box-shadow: none; } to { box-shadow: 0 0 16px rgba(255,23,68,0.4); } }
   .status-icon { font-size: 26px; flex-shrink: 0; }
   .status-title { font-size: 15px; font-weight: 700; color: #fff; }
   .status-desc { font-size: 11px; color: var(--dim); margin-top: 2px; }
-
-  /* BOTONES */
-  .buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 0 8px 8px;
-    flex-shrink: 0;
-  }
-  .btn {
-    height: 48px;
-    border: none;
-    border-radius: 8px;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.15s;
-    -webkit-appearance: none;
-  }
-  .btn:active { transform: scale(0.97); opacity: 0.9; }
+  .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 8px 8px; flex-shrink: 0; }
+  .btn { height: 48px; border: none; border-radius: 8px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1px; cursor: pointer; transition: all 0.15s; -webkit-appearance: none; }
+  .btn:active { transform: scale(0.97); }
   .btn-primary { background: var(--accent); color: #000; }
   .btn-stop { background: var(--danger); color: #fff; }
-  .btn-overtake {
-    background: #1a2540;
-    color: var(--warn);
-    border: 1px solid var(--warn);
-  }
-  .btn-overtake.active {
-    background: rgba(255,107,0,0.15);
-    color: var(--warn);
-  }
+  .btn-overtake { background: #1a2540; color: var(--warn); border: 1px solid var(--warn); }
+  .btn-overtake.active { background: rgba(255,107,0,0.15); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  /* ALERTA OVERLAY */
-  .alert-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(255,23,68,0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-    backdrop-filter: blur(4px);
-  }
+  .alert-overlay { position: fixed; inset: 0; background: rgba(255,23,68,0.25); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(4px); }
   .alert-overlay.show { opacity: 1; pointer-events: all; }
-  .alert-box {
-    background: #0a050f;
-    border: 2px solid var(--danger);
-    border-radius: 16px;
-    padding: 28px 24px;
-    text-align: center;
-    max-width: 300px;
-    width: 90%;
-    animation: pulse-border 1s infinite alternate;
-  }
-  @keyframes pulse-border {
-    from { border-color: var(--danger); box-shadow: 0 0 20px rgba(255,23,68,0.3); }
-    to { border-color: #ff6b9d; box-shadow: 0 0 40px rgba(255,23,68,0.6); }
-  }
+  .alert-box { background: #0a050f; border: 2px solid var(--danger); border-radius: 16px; padding: 28px 24px; text-align: center; max-width: 300px; width: 90%; animation: pulse-border 1s infinite alternate; }
+  @keyframes pulse-border { from { box-shadow: 0 0 20px rgba(255,23,68,0.3); } to { box-shadow: 0 0 40px rgba(255,23,68,0.6); } }
   .alert-emoji { font-size: 52px; margin-bottom: 8px; }
   .alert-label { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 2px; margin-bottom: 6px; }
   .alert-title { font-size: 22px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 6px; }
   .alert-sub { font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 18px; }
-  .btn-dismiss {
-    background: var(--danger);
-    color: #fff;
-    border: none;
-    padding: 10px 28px;
-    border-radius: 8px;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    cursor: pointer;
-  }
-
-  /* GPS dot animado */
-  .gps-dot {
-    width: 16px;
-    height: 16px;
-    background: var(--accent);
-    border-radius: 50%;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 0 0 0 rgba(0,229,255,0.5);
-    animation: gps-pulse 2s infinite;
-    z-index: 10;
-  }
-  @keyframes gps-pulse {
-    0% { box-shadow: 0 0 0 0 rgba(0,229,255,0.5); }
-    70% { box-shadow: 0 0 0 14px rgba(0,229,255,0); }
-    100% { box-shadow: 0 0 0 0 rgba(0,229,255,0); }
-  }
+  .btn-dismiss { background: var(--danger); color: #fff; border: none; padding: 10px 28px; border-radius: 8px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1px; cursor: pointer; }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div class="header-title">🛡️ OVERTAKEGUARD</div>
   <div class="badge" id="connBadge">● EN RED</div>
 </div>
 
-<!-- HUD -->
 <div class="hud">
   <div class="hud-card">
     <div class="hud-label">Velocidad</div>
@@ -242,23 +74,20 @@
     <div class="hud-value" id="hudHeading" style="font-size:20px;padding-top:4px">---</div>
     <div class="hud-unit">dirección</div>
   </div>
-  <div class="hud-card" onclick="toggleVehiclePanel()">
+  <div class="hud-card">
     <div class="hud-label">Cerca</div>
     <div class="hud-value" id="hudVCount">0</div>
     <div class="hud-unit">vehículos</div>
   </div>
 </div>
 
-<!-- MAPA -->
 <div id="map">
   <div class="map-placeholder" id="mapPlaceholder">
     <div class="icon">🗺️</div>
-    <div class="text">Iniciá para ver tu posición</div>
+    <div class="text">Cargando mapa...</div>
   </div>
-  <div class="gps-dot" id="gpsDot" style="display:none; left:50%; top:50%;"></div>
 </div>
 
-<!-- STATUS -->
 <div class="status-card" id="statusCard">
   <div class="status-icon" id="statusIcon">✅</div>
   <div>
@@ -267,86 +96,47 @@
   </div>
 </div>
 
-<!-- BOTONES -->
 <div class="buttons">
   <button class="btn btn-primary" id="btnMain" onclick="toggleSystem()">▶ INICIAR</button>
-  <button class="btn btn-overtake" id="btnOvertake" onclick="toggleOvertake()" disabled>↗ ADELANTAR</button>
+  <button class="btn btn-overtake" id="btnOvertake" onclick="toggleOvertakeManual()" disabled>↗ ADELANTAR</button>
 </div>
 
-<!-- ALERTA OVERLAY -->
 <div class="alert-overlay" id="alertOverlay">
   <div class="alert-box">
     <div class="alert-emoji">⚠️</div>
     <div class="alert-label">PELIGRO INMINENTE</div>
-    <div class="alert-title" id="alertTitle">PRECAUCIÓN</div>
-    <div class="alert-sub" id="alertSub">Vehículo en sentido contrario</div>
+    <div class="alert-title" id="alertTitle">AUTO EN SENTIDO CONTRARIO</div>
+    <div class="alert-sub" id="alertSub">Vehículo detectado</div>
     <button class="btn-dismiss" onclick="dismissAlert()">ENTENDIDO</button>
   </div>
 </div>
 
 <script>
-// ─── Firebase Config ───
 const FIREBASE_URL = 'https://overtakeguard-default-rtdb.firebaseio.com';
 
-// ─── Estado ───
-let isRunning = false;
-let isOvertaking = false;
-let watchId = null;
+let isRunning = false, isOvertaking = false, watchId = null;
 let myId = 'v_' + Math.random().toString(36).substr(2, 8);
-let currentLat = null, currentLng = null;
-let currentSpeed = 0, currentHeading = 0;
-let lastUpdateTime = 0;
-let nearbyVehicles = {};
-let alertActive = false;
-let mapInitialized = false;
-let googleMap = null;
-let myMapMarker = null;
-let mapCentered = false;
+let currentLat = null, currentLng = null, currentSpeed = 0, currentHeading = 0;
+let lastUpdateTime = 0, nearbyVehicles = {}, alertActive = false;
+let googleMap = null, myMapMarker = null, mapCentered = false;
+let overtakePhase = 'none', followingVehicleId = null, headingHistory = [];
 
-// ─── Detección automática de adelantamiento ───
-let overtakePhase = 'none'; // 'none' | 'following' | 'overtaking'
-let followingVehicleId = null;
-let headingHistory = [];
-let followingStartTime = 0;
-
-// ─── Firebase helpers ───
 async function fbSet(path, data) {
-  try {
-    await fetch(`${FIREBASE_URL}/${path}.json`, {
-      method: 'PUT',
-      body: JSON.stringify(data)
-    });
-  } catch(e) {}
+  try { await fetch(`${FIREBASE_URL}/${path}.json`, { method: 'PUT', body: JSON.stringify(data) }); } catch(e) {}
 }
-
 async function fbDelete(path) {
-  try {
-    await fetch(`${FIREBASE_URL}/${path}.json`, { method: 'DELETE' });
-  } catch(e) {}
+  try { await fetch(`${FIREBASE_URL}/${path}.json`, { method: 'DELETE' }); } catch(e) {}
 }
-
 function fbListen(path, callback) {
-  const url = `${FIREBASE_URL}/${path}.json`;
   const poll = async () => {
     if (!isRunning) return;
-    try {
-      const r = await fetch(url);
-      const data = await r.json();
-      callback(data);
-    } catch(e) {}
+    try { const r = await fetch(`${FIREBASE_URL}/${path}.json`); callback(await r.json()); } catch(e) {}
     setTimeout(poll, 2000);
   };
   poll();
 }
 
-// ─── Sistema principal ───
-function toggleSystem() {
-  if (isRunning) {
-    stopSystem();
-  } else {
-    startSystem();
-  }
-}
+function toggleSystem() { isRunning ? stopSystem() : startSystem(); }
 
 function startSystem() {
   isRunning = true;
@@ -369,38 +159,25 @@ function stopSystem() {
   document.getElementById('hudSpeed').textContent = '0';
   document.getElementById('hudHeading').textContent = '---';
   document.getElementById('hudVCount').textContent = '0';
-  document.getElementById('gpsDot').style.display = 'none';
-  document.getElementById('mapPlaceholder').style.display = 'flex';
-  setStatus('✅', 'Sistema detenido', 'Presioná INICIAR para activar', 'safe');
   if (myMapMarker) { myMapMarker.setMap(null); myMapMarker = null; }
+  resetOvertakePhase();
+  setStatus('✅', 'Sistema detenido', 'Presioná INICIAR para activar', 'safe');
 }
 
 async function checkFirebase() {
   try {
     const r = await fetch(`${FIREBASE_URL}/.json?shallow=true`);
-    const badge = document.getElementById('connBadge');
-    if (r.ok) {
-      badge.textContent = '● EN RED';
-      badge.className = 'badge';
-    } else {
-      badge.textContent = '● SIN RED';
-      badge.className = 'badge offline';
-    }
+    document.getElementById('connBadge').textContent = r.ok ? '● EN RED' : '● SIN RED';
+    document.getElementById('connBadge').className = r.ok ? 'badge' : 'badge offline';
   } catch(e) {
     document.getElementById('connBadge').textContent = '● SIN RED';
     document.getElementById('connBadge').className = 'badge offline';
   }
 }
 
-// ─── GPS ───
 function startGPS() {
-  if (!navigator.geolocation) {
-    setStatus('❌', 'Sin GPS', 'Este dispositivo no soporta geolocalización', 'warn');
-    return;
-  }
-
-  watchId = navigator.geolocation.watchPosition(
-    onLocationUpdate,
+  if (!navigator.geolocation) { setStatus('❌', 'Sin GPS', 'No soportado', 'warn'); return; }
+  watchId = navigator.geolocation.watchPosition(onLocationUpdate,
     (err) => setStatus('⚠️', 'Error GPS', err.message, 'warn'),
     { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
   );
@@ -411,341 +188,179 @@ function onLocationUpdate(pos) {
   currentLng = pos.coords.longitude;
   currentSpeed = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
   currentHeading = pos.coords.heading || 0;
-
   const dirs = ['N','NE','E','SE','S','SO','O','NO'];
-  const dir = dirs[Math.round(currentHeading / 45) % 8] || 'N';
-
   document.getElementById('hudSpeed').textContent = currentSpeed;
-  document.getElementById('hudHeading').textContent = dir;
-
-  // Guardar historial de rumbo para detectar desvío
+  document.getElementById('hudHeading').textContent = dirs[Math.round(currentHeading / 45) % 8] || 'N';
   headingHistory.push({ heading: currentHeading, ts: Date.now() });
   if (headingHistory.length > 10) headingHistory.shift();
-
-  // Detectar adelantamiento automático
   detectOvertakeAuto();
-
-  // Actualizar mapa
   updateMapPosition(currentLat, currentLng);
-
-  // Publicar en Firebase
   const now = Date.now();
   if (now - lastUpdateTime > 1500) {
     lastUpdateTime = now;
-    fbSet(`vehicles/${myId}`, {
-      lat: currentLat,
-      lng: currentLng,
-      speed: currentSpeed,
-      heading: currentHeading,
-      ts: now,
-      overtaking: isOvertaking
-    });
+    fbSet(`vehicles/${myId}`, { lat: currentLat, lng: currentLng, speed: currentSpeed, heading: currentHeading, ts: now, overtaking: isOvertaking });
   }
 }
 
-// ─── Detección automática de adelantamiento ───
 function detectOvertakeAuto() {
-  if (!isRunning || currentSpeed < 20) {
-    if (overtakePhase !== 'none') resetOvertakePhase();
-    return;
-  }
-
-  // Buscar vehículo adelante (mismo rumbo, distancia < 80m)
+  if (!isRunning || currentSpeed < 20) { if (overtakePhase !== 'none') resetOvertakePhase(); return; }
   let vehicleAhead = null;
   Object.entries(nearbyVehicles).forEach(([id, v]) => {
-    const headingDiff = Math.abs(currentHeading - v.heading);
-    const isSameDir = headingDiff < 45 || headingDiff > 315;
-    if (isSameDir && v.dist < 80 && v.dist > 5) {
-      vehicleAhead = { id, ...v };
-    }
+    const diff = Math.abs(currentHeading - v.heading);
+    if ((diff < 45 || diff > 315) && v.dist < 80 && v.dist > 5) vehicleAhead = { id, ...v };
   });
-
   if (overtakePhase === 'none' && vehicleAhead) {
-    // Fase 1: hay un auto adelante, empezamos a seguirlo
-    overtakePhase = 'following';
-    followingVehicleId = vehicleAhead.id;
-    followingStartTime = Date.now();
-    setStatus('👀', 'Vehículo adelante', 'Siguiendo vehículo — si adelantás te aviso', 'warn');
+    overtakePhase = 'following'; followingVehicleId = vehicleAhead.id;
+    setStatus('👀', 'Vehículo adelante', 'Si adelantás te aviso automáticamente', 'warn');
   }
-
   if (overtakePhase === 'following') {
-    // Verificar si el vehículo seguido sigue adelante
-    if (!vehicleAhead || vehicleAhead.id !== followingVehicleId) {
-      resetOvertakePhase();
-      return;
-    }
-
-    // Detectar desvío — cambio de rumbo > 15° en los últimos 3 segundos
+    if (!vehicleAhead || vehicleAhead.id !== followingVehicleId) { resetOvertakePhase(); return; }
     if (headingHistory.length >= 3) {
-      const recent = headingHistory.slice(-3);
-      const oldest = headingHistory[0];
-      const headingChange = Math.abs(recent[recent.length-1].heading - oldest.heading);
-      const timeElapsed = recent[recent.length-1].ts - oldest.ts;
-
-      if (headingChange > 15 && headingChange < 180 && timeElapsed < 4000) {
-        // ¡Estás adelantando!
-        overtakePhase = 'overtaking';
-        isOvertaking = true;
+      const oldest = headingHistory[0], newest = headingHistory[headingHistory.length-1];
+      const change = Math.abs(newest.heading - oldest.heading);
+      if (change > 15 && change < 180 && (newest.ts - oldest.ts) < 4000) {
+        overtakePhase = 'overtaking'; isOvertaking = true;
         document.getElementById('btnOvertake').textContent = '✕ CANCELAR';
         document.getElementById('btnOvertake').className = 'btn btn-overtake active';
-        setStatus('🚀', 'ADELANTANDO', 'Detectado automáticamente — vigilando sentido contrario', 'warn');
+        setStatus('🚀', 'ADELANTANDO', 'Detectado automáticamente', 'warn');
       }
     }
   }
-
   if (overtakePhase === 'overtaking') {
-    // Terminar adelantamiento cuando el rumbo se estabiliza y no hay auto adelante
-    const headingStable = headingHistory.length >= 4 &&
-      Math.abs(headingHistory[headingHistory.length-1].heading - headingHistory[headingHistory.length-4].heading) < 8;
-
-    if (headingStable && !vehicleAhead) {
-      resetOvertakePhase();
-    }
+    const len = headingHistory.length;
+    const stable = len >= 4 && Math.abs(headingHistory[len-1].heading - headingHistory[len-4].heading) < 8;
+    if (stable && !vehicleAhead) resetOvertakePhase();
   }
 }
 
 function resetOvertakePhase() {
-  overtakePhase = 'none';
-  followingVehicleId = null;
-  isOvertaking = false;
+  overtakePhase = 'none'; followingVehicleId = null; isOvertaking = false;
   document.getElementById('btnOvertake').textContent = '↗ ADELANTAR';
   document.getElementById('btnOvertake').className = 'btn btn-overtake';
+  if (isRunning) setStatus('✅', 'Carril despejado', 'Sin vehículos en sentido contrario', 'safe');
 }
 
-// ─── Mapa ───
+function toggleOvertakeManual() {
+  if (isOvertaking) { resetOvertakePhase(); return; }
+  overtakePhase = 'overtaking'; isOvertaking = true;
+  document.getElementById('btnOvertake').textContent = '✕ CANCELAR';
+  document.getElementById('btnOvertake').className = 'btn btn-overtake active';
+  setStatus('🚀', 'ADELANTANDO', 'Modo manual — vigilando sentido contrario', 'warn');
+}
+
 function updateMapPosition(lat, lng) {
   document.getElementById('mapPlaceholder').style.display = 'none';
-
-  if (googleMap) {
-    const pos = new google.maps.LatLng(lat, lng);
-    if (!myMapMarker) {
-      myMapMarker = new google.maps.Marker({
-        position: pos,
-        map: googleMap,
-        title: 'Vos',
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 10,
-          fillColor: '#00e5ff',
-          fillOpacity: 1,
-          strokeColor: '#fff',
-          strokeWeight: 2
-        }
-      });
-    } else {
-      myMapMarker.setPosition(pos);
-    }
-    // Vista de conducción 3D
-googleMap.setCenter(pos);
-googleMap.setZoom(18);
-googleMap.setTilt(60);
-googleMap.setHeading(currentHeading);
-});
-    // Primer centrado con zoom
-    if (!mapCentered) {
-      mapCentered = true;
-      googleMap.setCenter(pos);
-      googleMap.setZoom(17);
-    }
-    return;
+  if (!googleMap) return;
+  const pos = new google.maps.LatLng(lat, lng);
+  const icon = { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, scale: 6, fillColor: '#00e5ff', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2, rotation: currentHeading };
+  if (!myMapMarker) {
+    myMapMarker = new google.maps.Marker({ position: pos, map: googleMap, title: 'Vos', icon });
+  } else {
+    myMapMarker.setPosition(pos);
+    myMapMarker.setIcon(icon);
   }
-
-  // Fallback: punto CSS si no hay Google Maps
-  const dot = document.getElementById('gpsDot');
-  dot.style.display = 'block';
-  dot.style.left = '50%';
-  dot.style.top = '50%';
+  googleMap.setCenter(pos);
+  googleMap.setZoom(18);
+  googleMap.setTilt(60);
+  googleMap.setHeading(currentHeading);
 }
 
 function initMap() {
-  const mapEl = document.getElementById('map');
-  googleMap = new google.maps.Map(mapEl, {
-    zoom: 18,
-tilt: 60,
-heading: 0,
-    center: { lat: -32.889, lng: -68.845 },
-    mapTypeId: 'roadmap',
-    disableDefaultUI: false,
-    zoomControl: true,
-    mapTypeControl: false,
-    streetViewControl: false,
-    fullscreenControl: false,
+  googleMap = new google.maps.Map(document.getElementById('map'), {
+    zoom: 17, tilt: 60, center: { lat: -32.889, lng: -68.845 },
+    mapTypeId: 'roadmap', zoomControl: true, mapTypeControl: false,
+    streetViewControl: false, fullscreenControl: false,
     styles: [
       { elementType: 'geometry', stylers: [{ color: '#0d1420' }] },
-      { elementType: 'labels.text.fill', stylers: [{ color: '#4a6080' }] },
+      { elementType: 'labels.text.fill', stylers: [{ color: '#748cad' }] },
       { elementType: 'labels.text.stroke', stylers: [{ color: '#080c12' }] },
       { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#1a2540' }] },
       { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#1f3060' }] },
       { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#243b6e' }] },
+      { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#9ca5b3' }] },
       { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#050a14' }] },
+      { featureType: 'poi', stylers: [{ visibility: 'off' }] },
     ]
   });
-  mapInitialized = true;
-
-  // Centrar en posición actual apenas carga el mapa
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const userPos = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude
-        };
-        googleMap.setCenter(userPos);
-        googleMap.setZoom(17);
-        // Mostrar marcador inicial
-        new google.maps.Marker({
-          position: userPos,
-          map: googleMap,
-          title: 'Tu posición',
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 8,
-            fillColor: '#00e5ff',
-            fillOpacity: 0.6,
-            strokeColor: '#00e5ff',
-            strokeWeight: 2
-          }
-        });
-        document.getElementById('mapPlaceholder').style.display = 'none';
-      },
-      () => {},
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
+    navigator.geolocation.getCurrentPosition((pos) => {
+      googleMap.setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      googleMap.setZoom(17);
+      googleMap.setTilt(60);
+      document.getElementById('mapPlaceholder').style.display = 'none';
+    }, () => {}, { enableHighAccuracy: true, timeout: 10000 });
   }
 }
 window.initMap = initMap;
 
-// ─── Procesar vehículos cercanos ───
 function processVehicles(data) {
   if (!data || !currentLat) return;
   nearbyVehicles = {};
-  let count = 0;
-  let maxRisk = 'safe';
-
+  let count = 0, maxRisk = 'safe';
   Object.entries(data).forEach(([id, v]) => {
-    if (id === myId) return;
-    if (Date.now() - v.ts > 10000) return;
-
+    if (id === myId || Date.now() - v.ts > 10000) return;
     const dist = getDistance(currentLat, currentLng, v.lat, v.lng);
     if (dist > 500) return;
-
-    const headingDiff = Math.abs(currentHeading - v.heading);
-    const isOpposing = headingDiff > 120 && headingDiff < 240;
+    const diff = Math.abs(currentHeading - v.heading);
+    const isOpposing = diff > 120 && diff < 240;
     const relSpeed = currentSpeed + (isOpposing ? v.speed : 0);
-    const ttc = relSpeed > 0 ? (dist / (relSpeed / 3.6)) : 999;
-
+    const ttc = relSpeed > 0 ? dist / (relSpeed / 3.6) : 999;
     let risk = 'safe';
-    if (isOpposing) {
-      if (ttc < 5 || dist < 80) risk = 'danger';
-      else if (ttc < 12 || dist < 200) risk = 'warn';
-    }
-
+    if (isOpposing) { if (ttc < 5 || dist < 80) risk = 'danger'; else if (ttc < 12 || dist < 200) risk = 'warn'; }
     nearbyVehicles[id] = { ...v, dist, isOpposing, ttc, risk };
     count++;
-
     if (risk === 'danger') maxRisk = 'danger';
     else if (risk === 'warn' && maxRisk !== 'danger') maxRisk = 'warn';
-
-    if (risk === 'danger' && !alertActive && isOvertaking) {
-      triggerAlert(v, dist, ttc);
-    }
+    if (risk === 'danger' && !alertActive && isOvertaking) triggerAlert(v, dist, ttc);
   });
-
   document.getElementById('hudVCount').textContent = count;
-  updateStatus(maxRisk, count);
-}
-
-function updateStatus(maxRisk, count) {
-  if (maxRisk === 'danger') {
-    setStatus('🚨', 'PELIGRO', `${count} vehículo(s) en sentido contrario`, 'danger');
-  } else if (maxRisk === 'warn') {
-    setStatus('⚠️', 'Precaución', `Vehículo cercano detectado`, 'warn');
-  } else {
-    setStatus('✅', 'Carril despejado', 'Sin vehículos en sentido contrario', 'safe');
+  if (!isOvertaking) {
+    if (maxRisk === 'danger') setStatus('🚨', 'PELIGRO', 'Vehículo en sentido contrario', 'danger');
+    else if (maxRisk === 'warn') setStatus('⚠️', 'Precaución', 'Vehículo cercano detectado', 'warn');
+    else setStatus('✅', 'Carril despejado', 'Sin vehículos en sentido contrario', 'safe');
   }
 }
 
 function triggerAlert(vehicle, dist, ttc) {
   alertActive = true;
-  document.getElementById('alertTitle').textContent = 'AUTO EN SENTIDO\nCONTRARIO';
+  document.getElementById('alertTitle').textContent = 'AUTO EN SENTIDO CONTRARIO';
   document.getElementById('alertSub').textContent = `A ${Math.round(dist)}m · ~${Math.round(ttc)} segundos`;
   document.getElementById('alertOverlay').classList.add('show');
-
-  // Vibrar
   if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 600]);
-
-  // Sonido
   playAlert();
 }
 
-function dismissAlert() {
-  alertActive = false;
-  document.getElementById('alertOverlay').classList.remove('show');
-}
+function dismissAlert() { alertActive = false; document.getElementById('alertOverlay').classList.remove('show'); }
 
-// ─── Adelantamiento manual (override) ───
-function toggleOvertake() {
-  if (isOvertaking) {
-    resetOvertakePhase();
-  } else {
-    overtakePhase = 'overtaking';
-    isOvertaking = true;
-    document.getElementById('btnOvertake').textContent = '✕ CANCELAR';
-    document.getElementById('btnOvertake').className = 'btn btn-overtake active';
-    setStatus('🚀', 'ADELANTANDO', 'Modo manual — vigilando sentido contrario', 'warn');
-  }
-}
-
-function toggleVehiclePanel() {}
-
-// ─── UI helpers ───
 function setStatus(icon, title, desc, level) {
   document.getElementById('statusIcon').textContent = icon;
   document.getElementById('statusTitle').textContent = title;
   document.getElementById('statusDesc').textContent = desc;
-  const card = document.getElementById('statusCard');
-  card.className = 'status-card ' + (level !== 'safe' ? level : '');
+  document.getElementById('statusCard').className = 'status-card ' + (level !== 'safe' ? level : '');
 }
 
-// ─── Audio ───
 function playAlert() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const pattern = [[880, 0.18], [0, 0.05], [660, 0.12], [0, 0.05], [880, 0.28]];
-    let time = ctx.currentTime;
-    pattern.forEach(([freq, dur]) => {
-      if (freq > 0) {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.4, time);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
-        osc.start(time);
-        osc.stop(time + dur);
-      }
-      time += dur;
-    });
+    [[880,0.18],[0,0.05],[660,0.12],[0,0.05],[880,0.28]].reduce((t,[f,d]) => {
+      if (f > 0) { const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value=f; g.gain.setValueAtTime(0.4,t); g.gain.exponentialRampToValueAtTime(0.001,t+d); o.start(t); o.stop(t+d); }
+      return t+d;
+    }, ctx.currentTime);
   } catch(e) {}
 }
 
-// ─── Utilidades ───
-function getDistance(lat1, lng1, lat2, lng2) {
-  const R = 6371000;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLng = (lng2 - lng1) * Math.PI / 180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+function getDistance(lat1,lng1,lat2,lng2) {
+  const R=6371000,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
 
-// ─── Init ───
 checkFirebase();
 setInterval(() => { if (isRunning) checkFirebase(); }, 30000);
 </script>
 
-<!-- Google Maps (reemplazá TU_API_KEY con tu clave real) -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzezH8AHI2G6DWsqIlSFiWtAGswMmbtAw&callback=initMap" async defer></script>
+<!-- Reemplazá TU_API_KEY con tu clave de Google Maps -->
+<script src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap" async defer></script>
 
 </body>
 </html>
