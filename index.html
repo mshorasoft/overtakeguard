@@ -301,6 +301,13 @@ let alertActive = false;
 let mapInitialized = false;
 let googleMap = null;
 let myMapMarker = null;
+let mapCentered = false;
+
+// ─── Detección automática de adelantamiento ───
+let overtakePhase = 'none'; // 'none' | 'following' | 'overtaking'
+let followingVehicleId = null;
+let headingHistory = [];
+let followingStartTime = 0;
 
 // ─── Firebase helpers ───
 async function fbSet(path, data) {
@@ -411,6 +418,13 @@ function onLocationUpdate(pos) {
   document.getElementById('hudSpeed').textContent = currentSpeed;
   document.getElementById('hudHeading').textContent = dir;
 
+  // Guardar historial de rumbo para detectar desvío
+  headingHistory.push({ heading: currentHeading, ts: Date.now() });
+  if (headingHistory.length > 10) headingHistory.shift();
+
+  // Detectar adelantamiento automático
+  detectOvertakeAuto();
+
   // Actualizar mapa
   updateMapPosition(currentLat, currentLng);
 
@@ -427,6 +441,75 @@ function onLocationUpdate(pos) {
       overtaking: isOvertaking
     });
   }
+}
+
+// ─── Detección automática de adelantamiento ───
+function detectOvertakeAuto() {
+  if (!isRunning || currentSpeed < 20) {
+    if (overtakePhase !== 'none') resetOvertakePhase();
+    return;
+  }
+
+  // Buscar vehículo adelante (mismo rumbo, distancia < 80m)
+  let vehicleAhead = null;
+  Object.entries(nearbyVehicles).forEach(([id, v]) => {
+    const headingDiff = Math.abs(currentHeading - v.heading);
+    const isSameDir = headingDiff < 45 || headingDiff > 315;
+    if (isSameDir && v.dist < 80 && v.dist > 5) {
+      vehicleAhead = { id, ...v };
+    }
+  });
+
+  if (overtakePhase === 'none' && vehicleAhead) {
+    // Fase 1: hay un auto adelante, empezamos a seguirlo
+    overtakePhase = 'following';
+    followingVehicleId = vehicleAhead.id;
+    followingStartTime = Date.now();
+    setStatus('👀', 'Vehículo adelante', 'Siguiendo vehículo — si adelantás te aviso', 'warn');
+  }
+
+  if (overtakePhase === 'following') {
+    // Verificar si el vehículo seguido sigue adelante
+    if (!vehicleAhead || vehicleAhead.id !== followingVehicleId) {
+      resetOvertakePhase();
+      return;
+    }
+
+    // Detectar desvío — cambio de rumbo > 15° en los últimos 3 segundos
+    if (headingHistory.length >= 3) {
+      const recent = headingHistory.slice(-3);
+      const oldest = headingHistory[0];
+      const headingChange = Math.abs(recent[recent.length-1].heading - oldest.heading);
+      const timeElapsed = recent[recent.length-1].ts - oldest.ts;
+
+      if (headingChange > 15 && headingChange < 180 && timeElapsed < 4000) {
+        // ¡Estás adelantando!
+        overtakePhase = 'overtaking';
+        isOvertaking = true;
+        document.getElementById('btnOvertake').textContent = '✕ CANCELAR';
+        document.getElementById('btnOvertake').className = 'btn btn-overtake active';
+        setStatus('🚀', 'ADELANTANDO', 'Detectado automáticamente — vigilando sentido contrario', 'warn');
+      }
+    }
+  }
+
+  if (overtakePhase === 'overtaking') {
+    // Terminar adelantamiento cuando el rumbo se estabiliza y no hay auto adelante
+    const headingStable = headingHistory.length >= 4 &&
+      Math.abs(headingHistory[headingHistory.length-1].heading - headingHistory[headingHistory.length-4].heading) < 8;
+
+    if (headingStable && !vehicleAhead) {
+      resetOvertakePhase();
+    }
+  }
+}
+
+function resetOvertakePhase() {
+  overtakePhase = 'none';
+  followingVehicleId = null;
+  isOvertaking = false;
+  document.getElementById('btnOvertake').textContent = '↗ ADELANTAR';
+  document.getElementById('btnOvertake').className = 'btn btn-overtake';
 }
 
 // ─── Mapa ───
@@ -452,12 +535,18 @@ function updateMapPosition(lat, lng) {
     } else {
       myMapMarker.setPosition(pos);
     }
+    // Centrar siempre en la posición actual mientras se mueve
     googleMap.panTo(pos);
+    // Primer centrado con zoom
+    if (!mapCentered) {
+      mapCentered = true;
+      googleMap.setCenter(pos);
+      googleMap.setZoom(17);
+    }
     return;
   }
 
   // Fallback: punto CSS si no hay Google Maps
-  const mapEl = document.getElementById('map');
   const dot = document.getElementById('gpsDot');
   dot.style.display = 'block';
   dot.style.left = '50%';
@@ -557,12 +646,17 @@ function dismissAlert() {
   document.getElementById('alertOverlay').classList.remove('show');
 }
 
-// ─── Adelantamiento ───
+// ─── Adelantamiento manual (override) ───
 function toggleOvertake() {
-  isOvertaking = !isOvertaking;
-  const btn = document.getElementById('btnOvertake');
-  btn.textContent = isOvertaking ? '✕ CANCELAR' : '↗ ADELANTAR';
-  btn.className = isOvertaking ? 'btn btn-overtake active' : 'btn btn-overtake';
+  if (isOvertaking) {
+    resetOvertakePhase();
+  } else {
+    overtakePhase = 'overtaking';
+    isOvertaking = true;
+    document.getElementById('btnOvertake').textContent = '✕ CANCELAR';
+    document.getElementById('btnOvertake').className = 'btn btn-overtake active';
+    setStatus('🚀', 'ADELANTANDO', 'Modo manual — vigilando sentido contrario', 'warn');
+  }
 }
 
 function toggleVehiclePanel() {}
