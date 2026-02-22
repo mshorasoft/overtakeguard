@@ -556,7 +556,7 @@ function updateMapPosition(lat, lng) {
 function initMap() {
   const mapEl = document.getElementById('map');
   googleMap = new google.maps.Map(mapEl, {
-    zoom: 17,
+    zoom: 15,
     center: { lat: -32.889, lng: -68.845 },
     mapTypeId: 'roadmap',
     disableDefaultUI: false,
@@ -575,6 +575,37 @@ function initMap() {
     ]
   });
   mapInitialized = true;
+
+  // Centrar en posición actual apenas carga el mapa
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const userPos = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        };
+        googleMap.setCenter(userPos);
+        googleMap.setZoom(17);
+        // Mostrar marcador inicial
+        new google.maps.Marker({
+          position: userPos,
+          map: googleMap,
+          title: 'Tu posición',
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 8,
+            fillColor: '#00e5ff',
+            fillOpacity: 0.6,
+            strokeColor: '#00e5ff',
+            strokeWeight: 2
+          }
+        });
+        document.getElementById('mapPlaceholder').style.display = 'none';
+      },
+      () => {},
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
 }
 window.initMap = initMap;
 
